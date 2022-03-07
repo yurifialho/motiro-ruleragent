@@ -1,0 +1,8 @@
+version: "3.8"
+services:
+  ruleragent:
+    extends:
+      file: ./docker-compose.yml
+      service: ruleragent
+    volumes:
+      - .:/usr/src/app:cached

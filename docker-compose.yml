@@ -1,0 +1,14 @@
+version: "3.8"
+services:
+  ruleragent:
+    build:
+      context: .
+    image: motiro-ruleragent:1
+    container_name: motiro-ruleragent
+    networks: 
+      - motiro-nw
+    volumes:
+      - .:/app/ruleragent
+
+networks: 
+  motiro-nw:
