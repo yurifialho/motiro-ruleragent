@@ -6,3 +6,5 @@ services:
       service: ruleragent
     volumes:
       - .:/usr/src/app:cached
+    ports:
+      - 10001:10001
