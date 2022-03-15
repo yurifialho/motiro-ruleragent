@@ -1,7 +1,7 @@
 version: "3.8"
 services:
-  ruleragent:
+  motiro-tuixaua:
     build:
       context: .
-    image: motiro-ruleragent:1
-    container_name: motiro-ruleragent
+    image: motiro-tuixaua
+    container_name: motiro-tuixaua

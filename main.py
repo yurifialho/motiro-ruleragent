@@ -1,43 +1,62 @@
 import time
-import asyncio
-import sys
-import logging
-from spade import quit_spade
-from spade.agent import Agent
-from spade.behaviour import CyclicBehaviour, OneShotBehaviour
-from spade.template import Template
-
-class RulerAgent(Agent):
-    class ReceiveMsgCyclicBehaviour(CyclicBehaviour):
-        async def run(self):
-            logging.info("Receiving msg...")
-
-            msg = await self.receive(timeout=10)
-            if msg:
-                logging.info("Message received with content: {}".format(msg.body))
-        
-        async def on_end(self):
-            await self.agent.stop()
-    
-    async def setup(self):
-        a = self.ReceiveMsgCyclicBehaviour()
-        self.add_behaviour(a)
+from aioxmpp.errors import MultiOSError
+from app.util.extras import LogoUtil
+from app.agent.chiefagent import ChiefAgent
+from app.config.config import Config
+from app.util.logger import Logger
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    # prosodyctl register ruleragent prosody-server ruleragent
-    ruleragent = RulerAgent("ruleragent@xmpp-server", "ruleragent")
-    future = ruleragent.start(auto_register=True)
-    ruleragent.web.start(hostname='ruleragent', port='10001')
-    future.result()
-
-    logging.info("Wait until user interrupts with ctrl+C")
-    while ruleragent.is_alive():
+    Logger.setup(__name__)
+    LogoUtil.info()
+    retry = True
+    retry_time = 2
+    retry_count = 1
+    while(retry):
         try:
-            while True:
-                time.sleep(1)
-        except KeyboardInterrupt:
-            logging.info("Stopping...")
-            ruleragent.stop()
-            break
-    quit_spade()
+            
+            Logger.info("Initializing Tuixaua Agent.....")
+            chiefagent = ChiefAgent(Config.getXMPPUser(), Config.getXMPPPass())
+            future = chiefagent.start(auto_register=True)
+            Logger.info("Tuixaua Agent Started.")
+            
+            if Config.isWebEnabled():
+                Logger.info("Initializing Web Interface from Tuixaua Agent.....")
+                host = Config.getHostWebName()
+                port = Config.getHostWebPort()
+                chiefagent.web.start(hostname=host,port=port, template_path="app/web/templates")
+                Logger.info("Web Interface Stated.")
+                Logger.info(f"Access: http://{host}:{port}/spade to monitoring.")
+            
+            future.result()
+            retry = False
+            Logger.info("Wait until user interrupts with ctrl+C")
+            while chiefagent.is_alive():
+                try:
+                    while True:
+                        time.sleep(1)
+                except KeyboardInterrupt:
+                    Logger.info("Stopping...")
+                    chiefagent.stop()
+                    break
+                finally:
+                    quit_spade()
+
+        except MultiOSError as err:
+            Logger.error(err)
+            if retry_count < 3:
+                retry_time *= 2
+                Logger.info(f"Retry to connect [{retry_count}]. Waiting {retry_time} seconds!")
+                time.sleep(retry_time)
+                Logger.info(f"Retry to connect [{retry_count}")
+                retry_count += 1
+            else:
+                retry = False
+                try:
+                    Logger.info("Stopping all services...")
+                    chiefagent.kill()
+                except:
+                    pass
+                Logger.error("Cannot connect at XMPP Server. Check your connection!")
+
+
+    

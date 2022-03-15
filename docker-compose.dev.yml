@@ -1,9 +1,9 @@
 version: "3.8"
 services:
-  ruleragent:
+  motiro-tuixaua:
     extends:
       file: ./docker-compose.yml
-      service: ruleragent
+      service: motiro-tuixaua
     volumes:
       - .:/usr/src/app:cached
     ports:
