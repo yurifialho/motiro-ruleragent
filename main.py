@@ -23,7 +23,7 @@ if __name__ == "__main__":
                 Logger.info("Initializing Web Interface from Tuixaua Agent.....")
                 host = Config.getHostWebName()
                 port = Config.getHostWebPort()
-                chiefagent.web.start(hostname=host,port=port, template_path="app/web/templates")
+                chiefagent.web.start(hostname=host,port=port, templates_path="app/web/templates")
                 Logger.info("Web Interface Stated.")
                 Logger.info(f"Access: http://{host}:{port}/spade to monitoring.")
             
