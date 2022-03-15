@@ -29,7 +29,9 @@ class Config:
         envhost = Config.getEnvVariables(Config.AG_XMPP_HOST)
 
         user = varuser if varuser else envuser
-        domain = vardomain if vardomain else envhost
+        domain = vardomain if vardomain != 'localhost' else envhost
+        if domain is None:
+            domain = vardomain
 
         if not user or not domain:
             raise Exception("User and domains is required to connect to XMPP Server!")
@@ -64,7 +66,7 @@ class Config:
     @staticmethod
     def getHostWebName(varhost : str = 'localhost') -> str:
         envhost  = Config.getEnvVariables(Config.AG_HOSTNAME)
-        if not envhost:
+        if envhost:
             return envhost
         else:
             return varhost
