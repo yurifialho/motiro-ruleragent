@@ -28,7 +28,7 @@ class Config:
         envuser = Config.getEnvVariables(Config.AG_XMPP_USER)
         envhost = Config.getEnvVariables(Config.AG_XMPP_HOST)
 
-        user = varuser if varuser else envuser
+        user = envuser if envuser else varuser
         domain = vardomain if vardomain != 'localhost' else envhost
         if domain is None:
             domain = vardomain

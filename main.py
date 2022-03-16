@@ -15,7 +15,10 @@ if __name__ == "__main__":
         try:
             
             Logger.info("Initializing Tuixaua Agent.....")
+            jid = Config.getXMPPUser()
+            Logger.info(f"Connecting with user: {jid}")
             chiefagent = ChiefAgent(Config.getXMPPUser(), Config.getXMPPPass())
+            #chiefagent.jid = jid
             future = chiefagent.start(auto_register=True)
             Logger.info("Tuixaua Agent Started.")
             
