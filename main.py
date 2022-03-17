@@ -9,7 +9,7 @@ if __name__ == "__main__":
     Logger.setup(__name__)
     LogoUtil.info()
     retry = True
-    retry_time = 2
+    retry_time = 5
     retry_count = 1
     while(retry):
         try:
@@ -17,7 +17,7 @@ if __name__ == "__main__":
             Logger.info("Initializing Tuixaua Agent.....")
             jid = Config.getXMPPUser()
             Logger.info(f"Connecting with user: {jid}")
-            chiefagent = ChiefAgent(Config.getXMPPUser(), Config.getXMPPPass())
+            chiefagent = ChiefAgent(Config.getXMPPUser(), Config.getXMPPPass(), verify_security = False)
             #chiefagent.jid = jid
             future = chiefagent.start(auto_register=True)
             Logger.info("Tuixaua Agent Started.")
@@ -34,15 +34,18 @@ if __name__ == "__main__":
             retry = False
             Logger.info("Wait until user interrupts with ctrl+C")
             while chiefagent.is_alive():
+                Logger.info(f"Chief is alive")
+                Logger.info("Chief is avaliable:"+str(chiefagent.presence.is_available()))
+                Logger.info(chiefagent.presence.status)
+                Logger.info(chiefagent.presence.state)
                 try:
                     while True:
-                        time.sleep(1)
+                        time.sleep(5)
                 except KeyboardInterrupt:
                     Logger.info("Stopping...")
                     chiefagent.stop()
                     break
-                finally:
-                    quit_spade()
+            Logger.info("Agent is dead!")
 
         except MultiOSError as err:
             Logger.error(err)
